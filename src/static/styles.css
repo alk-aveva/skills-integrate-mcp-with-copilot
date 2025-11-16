@@ -57,6 +57,119 @@ section h3 {
   color: #1a237e;
 }
 
+/* Filter Controls */
+#filter-controls {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 5px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-width: 150px;
+}
+
+.filter-group label {
+  font-weight: bold;
+  font-size: 14px;
+  color: #333;
+}
+
+.filter-group select {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: white;
+  cursor: pointer;
+}
+
+.secondary-btn {
+  background-color: #666;
+  padding: 8px 15px;
+  font-size: 14px;
+  height: fit-content;
+}
+
+.secondary-btn:hover {
+  background-color: #888;
+}
+
+/* Activity Card Enhancements */
+.activity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.activity-card h4 {
+  margin-bottom: 0;
+}
+
+/* Category Badges */
+.category-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.category-technical {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.category-sports {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.category-arts {
+  background-color: #fce4ec;
+  color: #c2185b;
+}
+
+.category-academic {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.category-default {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+/* Tags */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.tag {
+  display: inline-block;
+  padding: 3px 10px;
+  background-color: #e0e0e0;
+  color: #333;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
 .activity-card {
   margin-bottom: 15px;
   padding: 15px;
