@@ -3,15 +3,34 @@ document.addEventListener("DOMContentLoaded", () => {
   const activitySelect = document.getElementById("activity");
   const signupForm = document.getElementById("signup-form");
   const messageDiv = document.getElementById("message");
+  const categoryFilter = document.getElementById("category-filter");
+  const difficultyFilter = document.getElementById("difficulty-filter");
+  const clearFiltersBtn = document.getElementById("clear-filters");
 
-  // Function to fetch activities from API
-  async function fetchActivities() {
+  // Function to fetch activities from API with optional filters
+  async function fetchActivities(filters = {}) {
     try {
-      const response = await fetch("/activities");
+      // Build query string from filters
+      const params = new URLSearchParams();
+      if (filters.category) params.append("category", filters.category);
+      if (filters.difficulty) params.append("difficulty", filters.difficulty);
+      
+      const queryString = params.toString();
+      const url = queryString ? `/activities?${queryString}` : "/activities";
+      
+      const response = await fetch(url);
       const activities = await response.json();
 
       // Clear loading message
       activitiesList.innerHTML = "";
+      
+      // Clear activity select options (keep the first default option)
+      activitySelect.innerHTML = '<option value="">-- Select an activity --</option>';
+
+      if (Object.keys(activities).length === 0) {
+        activitiesList.innerHTML = "<p>No activities found matching your filters.</p>";
+        return;
+      }
 
       // Populate activities list
       Object.entries(activities).forEach(([name, details]) => {
@@ -20,6 +39,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const spotsLeft =
           details.max_participants - details.participants.length;
+
+        // Get category color class
+        const categoryClass = getCategoryClass(details.category);
+        
+        // Create tags HTML
+        const tagsHTML = details.tags && details.tags.length > 0
+          ? `<div class="tags">
+              ${details.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+            </div>`
+          : '';
 
         // Create participants HTML with delete icons instead of bullet points
         const participantsHTML =
@@ -38,9 +67,14 @@ document.addEventListener("DOMContentLoaded", () => {
             : `<p><em>No participants yet</em></p>`;
 
         activityCard.innerHTML = `
-          <h4>${name}</h4>
+          <div class="activity-header">
+            <h4>${name}</h4>
+            <span class="category-badge ${categoryClass}">${details.category}</span>
+          </div>
           <p>${details.description}</p>
+          ${tagsHTML}
           <p><strong>Schedule:</strong> ${details.schedule}</p>
+          <p><strong>Difficulty:</strong> ${details.difficulty_level}</p>
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
           <div class="participants-container">
             ${participantsHTML}
@@ -66,6 +100,36 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error fetching activities:", error);
     }
   }
+  
+  // Helper function to get category color class
+  function getCategoryClass(category) {
+    const categoryMap = {
+      'Technical': 'category-technical',
+      'Sports': 'category-sports',
+      'Arts': 'category-arts',
+      'Academic': 'category-academic'
+    };
+    return categoryMap[category] || 'category-default';
+  }
+  
+  // Handle filter changes
+  function handleFilterChange() {
+    const filters = {
+      category: categoryFilter.value,
+      difficulty: difficultyFilter.value
+    };
+    fetchActivities(filters);
+  }
+  
+  // Add event listeners for filters
+  categoryFilter.addEventListener("change", handleFilterChange);
+  difficultyFilter.addEventListener("change", handleFilterChange);
+  
+  clearFiltersBtn.addEventListener("click", () => {
+    categoryFilter.value = "";
+    difficultyFilter.value = "";
+    fetchActivities();
+  });
 
   // Handle unregister functionality
   async function handleUnregister(event) {

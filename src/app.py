@@ -25,55 +25,82 @@ activities = {
         "description": "Learn strategies and compete in chess tournaments",
         "schedule": "Fridays, 3:30 PM - 5:00 PM",
         "max_participants": 12,
-        "participants": ["michael@mergington.edu", "daniel@mergington.edu"]
+        "participants": ["michael@mergington.edu", "daniel@mergington.edu"],
+        "category": "Academic",
+        "tags": ["Strategy", "Competition", "Critical Thinking"],
+        "difficulty_level": "Beginner"
     },
     "Programming Class": {
         "description": "Learn programming fundamentals and build software projects",
         "schedule": "Tuesdays and Thursdays, 3:30 PM - 4:30 PM",
         "max_participants": 20,
-        "participants": ["emma@mergington.edu", "sophia@mergington.edu"]
+        "participants": ["emma@mergington.edu", "sophia@mergington.edu"],
+        "category": "Technical",
+        "tags": ["STEM", "Computer Science", "Beginner-Friendly"],
+        "difficulty_level": "Beginner"
     },
     "Gym Class": {
         "description": "Physical education and sports activities",
         "schedule": "Mondays, Wednesdays, Fridays, 2:00 PM - 3:00 PM",
         "max_participants": 30,
-        "participants": ["john@mergington.edu", "olivia@mergington.edu"]
+        "participants": ["john@mergington.edu", "olivia@mergington.edu"],
+        "category": "Sports",
+        "tags": ["Fitness", "Health", "Team Sports"],
+        "difficulty_level": "All Levels"
     },
     "Soccer Team": {
         "description": "Join the school soccer team and compete in matches",
         "schedule": "Tuesdays and Thursdays, 4:00 PM - 5:30 PM",
         "max_participants": 22,
-        "participants": ["liam@mergington.edu", "noah@mergington.edu"]
+        "participants": ["liam@mergington.edu", "noah@mergington.edu"],
+        "category": "Sports",
+        "tags": ["Team Sports", "Competition", "Outdoor"],
+        "difficulty_level": "Intermediate"
     },
     "Basketball Team": {
         "description": "Practice and play basketball with the school team",
         "schedule": "Wednesdays and Fridays, 3:30 PM - 5:00 PM",
         "max_participants": 15,
-        "participants": ["ava@mergington.edu", "mia@mergington.edu"]
+        "participants": ["ava@mergington.edu", "mia@mergington.edu"],
+        "category": "Sports",
+        "tags": ["Team Sports", "Competition", "Indoor"],
+        "difficulty_level": "Intermediate"
     },
     "Art Club": {
         "description": "Explore your creativity through painting and drawing",
         "schedule": "Thursdays, 3:30 PM - 5:00 PM",
         "max_participants": 15,
-        "participants": ["amelia@mergington.edu", "harper@mergington.edu"]
+        "participants": ["amelia@mergington.edu", "harper@mergington.edu"],
+        "category": "Arts",
+        "tags": ["Creative", "Visual Arts", "Relaxing"],
+        "difficulty_level": "All Levels"
     },
     "Drama Club": {
         "description": "Act, direct, and produce plays and performances",
         "schedule": "Mondays and Wednesdays, 4:00 PM - 5:30 PM",
         "max_participants": 20,
-        "participants": ["ella@mergington.edu", "scarlett@mergington.edu"]
+        "participants": ["ella@mergington.edu", "scarlett@mergington.edu"],
+        "category": "Arts",
+        "tags": ["Performing Arts", "Public Speaking", "Creative"],
+        "difficulty_level": "Beginner"
     },
     "Math Club": {
         "description": "Solve challenging problems and participate in math competitions",
         "schedule": "Tuesdays, 3:30 PM - 4:30 PM",
         "max_participants": 10,
-        "participants": ["james@mergington.edu", "benjamin@mergington.edu"]
+        "participants": ["james@mergington.edu", "benjamin@mergington.edu"],
+        "category": "Academic",
+        "tags": ["STEM", "Problem Solving", "Competition"],
+        "difficulty_level": "Advanced"
     },
     "Debate Team": {
         "description": "Develop public speaking and argumentation skills",
         "schedule": "Fridays, 4:00 PM - 5:30 PM",
         "max_participants": 12,
-        "participants": ["charlotte@mergington.edu", "henry@mergington.edu"]
+        "participants": ["charlotte@mergington.edu", "henry@mergington.edu"],
+        "category": "Academic",
+        "tags": ["Public Speaking", "Critical Thinking", "Communication"],
+        "difficulty_level": "Intermediate"
     }
 }
 
@@ -83,9 +110,46 @@ def root():
     return RedirectResponse(url="/static/index.html")
 
 
+@app.get("/categories")
+def get_categories():
+    """Get all unique categories and their activity counts"""
+    categories = {}
+    for activity_name, activity in activities.items():
+        category = activity.get("category", "Uncategorized")
+        if category not in categories:
+            categories[category] = {"count": 0, "activities": []}
+        categories[category]["count"] += 1
+        categories[category]["activities"].append(activity_name)
+    return categories
+
+
 @app.get("/activities")
-def get_activities():
-    return activities
+def get_activities(category: str = None, tag: str = None, difficulty: str = None):
+    """Get activities with optional filtering by category, tag, or difficulty"""
+    filtered_activities = activities.copy()
+    
+    # Filter by category
+    if category:
+        filtered_activities = {
+            name: activity for name, activity in filtered_activities.items()
+            if activity.get("category", "").lower() == category.lower()
+        }
+    
+    # Filter by tag
+    if tag:
+        filtered_activities = {
+            name: activity for name, activity in filtered_activities.items()
+            if tag.lower() in [t.lower() for t in activity.get("tags", [])]
+        }
+    
+    # Filter by difficulty
+    if difficulty:
+        filtered_activities = {
+            name: activity for name, activity in filtered_activities.items()
+            if activity.get("difficulty_level", "").lower() == difficulty.lower()
+        }
+    
+    return filtered_activities
 
 
 @app.post("/activities/{activity_name}/signup")
