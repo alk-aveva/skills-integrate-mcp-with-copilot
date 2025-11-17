@@ -7,9 +7,16 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <canvas id="git-branches-bg"></canvas>
     <header>
-      <h1>Mergington High School</h1>
-      <h2>Extracurricular Activities</h2>
+      <div class="header-content">
+        <img src="https://octodex.github.com/images/original.png" alt="Mergington Mascot" class="mascot-logo">
+        <div class="header-text">
+          <h1>Mergington High School</h1>
+          <h2>Extracurricular Activities</h2>
+        </div>
+        <img src="https://octodex.github.com/images/labtocat.png" alt="Lab Octocat" class="mascot-logo">
+      </div>
     </header>
 
     <main>
@@ -73,5 +80,82 @@
     </footer>
 
     <script src="app.js"></script>
+    <script>
+      // Animated Git-style branch lines background
+      const canvas = document.getElementById('git-branches-bg');
+      const ctx = canvas.getContext('2d');
+      
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+      
+      const branches = [];
+      const maxBranches = 8;
+      
+      class Branch {
+        constructor() {
+          this.reset();
+        }
+        
+        reset() {
+          this.x = Math.random() * canvas.width;
+          this.y = -50;
+          this.length = 0;
+          this.speed = 0.3 + Math.random() * 0.5;
+          this.angle = Math.PI / 2 + (Math.random() - 0.5) * 0.3;
+          this.color = `rgba(50, 205, 50, ${0.1 + Math.random() * 0.2})`;
+          this.maxLength = 100 + Math.random() * 200;
+        }
+        
+        update() {
+          this.length += this.speed;
+          this.y += Math.cos(this.angle) * this.speed;
+          this.x += Math.sin(this.angle) * this.speed;
+          
+          if (this.y > canvas.height + 50 || this.length > this.maxLength) {
+            this.reset();
+          }
+        }
+        
+        draw() {
+          ctx.beginPath();
+          ctx.strokeStyle = this.color;
+          ctx.lineWidth = 2;
+          ctx.moveTo(this.x, this.y);
+          ctx.lineTo(
+            this.x - Math.sin(this.angle) * this.length,
+            this.y - Math.cos(this.angle) * this.length
+          );
+          ctx.stroke();
+          
+          // Draw node at end
+          ctx.beginPath();
+          ctx.fillStyle = this.color;
+          ctx.arc(this.x, this.y, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      
+      for (let i = 0; i < maxBranches; i++) {
+        branches.push(new Branch());
+      }
+      
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        branches.forEach(branch => {
+          branch.update();
+          branch.draw();
+        });
+        
+        requestAnimationFrame(animate);
+      }
+      
+      animate();
+    </script>
   </body>
 </html>
